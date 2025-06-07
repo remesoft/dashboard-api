@@ -1,0 +1,40 @@
+{
+  "id": 1,
+  "name": "ICT megabook",
+  "image": "https://remesoft.com/images/book-01.jpg",
+  "isPublished": true,
+  "totalChapters": 6,
+  "totalGroups": 30,
+  "createdAt": "20th, May 2025",
+  "updatedAt": "20th, June 2025",
+  "chapters": [
+    {
+      "id": 1,
+      "name": "Information Technology",
+      "groups": [
+        {
+          "id": 1,
+          "name": "Group One"
+        },
+        {
+          "id": 1,
+          "name": "Group Name"
+        }
+      ]
+    },
+    {
+      "id": 1,
+      "name": "Number System",
+      "groups": [
+        {
+          "id": 1,
+          "name": "Group One for number system"
+        },
+        {
+          "id": 1,
+          "name": "Group Name"
+        }
+      ]
+    }
+  ]
+}

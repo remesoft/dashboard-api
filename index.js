@@ -1,0 +1,37 @@
+// external imports
+const express = require("express");
+const path = require("path");
+const cors = require("cors");
+
+// internal imports
+const {
+  defaultErrorHandler,
+  notFoundHandler,
+} = require("./middlewares/error-handler");
+const BrainBank = require("./routes/BrainBank.routes");
+
+// define app
+const app = express();
+
+// middlewares
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, "public")));
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+  })
+);
+
+// routes
+app.use("/brain-bank", BrainBank);
+
+// error handlers
+app.use(notFoundHandler);
+app.use(defaultErrorHandler);
+
+// listener...
+app.listen(8080, () => {
+  console.log("Server listening....");
+});
