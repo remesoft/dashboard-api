@@ -20,8 +20,41 @@ module.exports = {
   // ---------------------------------
   //        Get Single Book
   // -----------------------------------------
-  getBook: (req, res, next) => {
+  getBook: async (req, res, next) => {
     try {
+      // get book id form url
+      const bookId = req.params.id;
+      if (!bookId) return next(createError(404, "Book id not found"));
+
+      // check book existence
+      const book = await db.Book.findOne({
+        where: { id: bookId },
+        attributes: { exclude: ["createdAt", "updatedAt"] },
+        include: [
+          {
+            model: db.Chapter,
+            as: "chapters",
+            attributes: { exclude: ["createdAt", "updatedAt"] },
+            include: [
+              {
+                model: db.Group,
+                as: "groups",
+                attributes: { exclude: ["createdAt", "updatedAt"] },
+                include: [
+                  {
+                    model: db.Question,
+                    attributes: { exclude: ["createdAt", "updatedAt"] },
+                    as: "questions",
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      });
+      if (!book) return next(createError(404, "Book not found"));
+
+      // send response
       res.json(book);
     } catch (err) {
       next(createError(500, "Failed to retrieve book"));
@@ -67,11 +100,13 @@ module.exports = {
   // -----------------------------------------
   update: async (req, res, next) => {
     try {
-      const bookId = req.params.id ?? next(createError(404, "Book not found"));
-      const book = await db.Book.findByPk(bookId);
+      // get book id form url
+      const bookId = req.params.id;
+      if (!bookId) return next(createError(404, "Book id not found"));
 
-      // if book not found in database
-      if (!book) next(createError(404, "Book not found"));
+      // check book existence
+      const book = await db.Book.findByPk(bookId);
+      if (!book) return next(createError(404, "Book not found"));
 
       // set data for update
       const { name, image, isPublished } = req.body;
@@ -88,6 +123,7 @@ module.exports = {
         message: "Book updated successfully",
       });
     } catch (err) {
+      console.log(err);
       next(createError(500, "Failed to update book"));
     }
   },
@@ -98,7 +134,8 @@ module.exports = {
   delete: async (req, res, next) => {
     try {
       // get book id form request
-      const bookId = req.params.id ?? next(createError(404, "Book not found"));
+      const bookId = req.params.id;
+      if (!bookId) return next(createError(404, "Book not found"));
 
       // delete form database
       await db.Book.destroy({ where: { id: bookId } });
@@ -109,6 +146,7 @@ module.exports = {
         message: "Book were deleted successfully.",
       });
     } catch (err) {
+      console.log(err);
       next(createError(500, "Failed to delete book"));
     }
   },

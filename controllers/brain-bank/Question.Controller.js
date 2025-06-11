@@ -3,12 +3,14 @@ const createError = require("http-errors");
 const db = require("../../models");
 
 module.exports = {
-  // create group
+  // ---------------------------------
+  //        CREATE NEW QUESTION
+  // -----------------------------------------
   create: async (req, res, next) => {
     try {
       // get data form body
-      const groupId = req.body.id;
-      if (!groupId) next(createError(404, "Group ID not found"));
+      const groupId = req.body.groupId;
+      if (!groupId) return next(createError(404, "Group ID not found"));
 
       // create new question
       await db.Question.create({
@@ -22,50 +24,61 @@ module.exports = {
         message: "Question created successfully",
       });
     } catch (err) {
+      console.log(err);
       next(createError(500, "Failed to create Question"));
     }
   },
 
-  // update group
+  // ---------------------------------
+  //        UPDATE THE QUESTIONS
+  // -----------------------------------------
   update: async (req, res, next) => {
-    // get data form url
-    const questionId = req.params.id;
-    if (!questionId) next(createError(404, "Question ID not found"));
+    try {
+      // get data form url
+      const questionId = req.params.id;
+      if (!questionId) return next(createError(404, "Question ID not found"));
 
-    const question = await db.Question.findByPk(questionId);
+      // if group not found in database
+      const question = await db.Question.findByPk(questionId);
+      if (!question) return next(createError(404, "Question not found"));
 
-    // if group not found in database
-    if (!question) next(createError(404, "Question not found"));
+      // set data for update
+      const { answer } = req.body;
+      if (answer !== undefined) question.answer = answer;
 
-    // set data for update
-    const { answer } = req.body;
-    if (answer !== undefined) question.answer = answer;
+      // update book record
+      await question.save();
 
-    // update book record
-    await question.save();
-
-    // send response
-    res.status(200).json({
-      status: "success",
-      message: "Question updated successfully",
-    });
+      // send response
+      res.status(200).json({
+        status: "success",
+        message: "Question updated successfully",
+      });
+    } catch (err) {
+      console.log(err);
+      next(createError(500, "Failed to create Question"));
+    }
   },
 
-  // delete group
+  // ---------------------------------
+  //        DELETE THE QUESTION
+  // -----------------------------------------
   delete: async (req, res, next) => {
     try {
-      //   // get book id form request
-      //   const groupId = req.params.id;
-      //   // if group id not found
-      //   if (!groupId) next(createError(404, "Group ID not found"));
-      //   // delete form database
-      //   await db.Group.destroy({ where: { id: groupId } });
-      //   // send response
-      //   res.status(200).json({
-      //     status: "success",
-      //     message: "Group were deleted successfully.",
-      //   });
+      // get book id form request
+      const questionId = req.params.id;
+      if (!questionId) return next(createError(404, "Question ID not found"));
+
+      // delete form database
+      await db.Question.destroy({ where: { id: questionId } });
+
+      // send response
+      res.status(200).json({
+        status: "success",
+        message: "Group were deleted successfully.",
+      });
     } catch (err) {
+      console.log(err);
       next(createError(500, "Failed to delete Group"));
     }
   },
