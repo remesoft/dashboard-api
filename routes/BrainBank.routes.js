@@ -1,5 +1,6 @@
 // external imports
 const express = require("express");
+const upload = require("../middlewares/upload");
 
 // controllers
 const groups = require("../controllers/brain-bank/Group.Controller");
@@ -15,7 +16,7 @@ router.get("/books", books.getBooks);
 router.get("/books/:id", books.getBook);
 router.post("/books/create", books.create);
 router.delete("/books/:id", books.delete);
-router.put("/books/:id", books.update);
+router.patch("/books/:id", upload.single("cover"));
 
 router.get("/groups/:id", groups.getGroup);
 router.post("/groups/create", groups.create);

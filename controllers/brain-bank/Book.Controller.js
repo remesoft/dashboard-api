@@ -1,9 +1,9 @@
 // internal imports
-const book = require("../../database/brain-bank/book.json");
 const books = require("../../database/brain-bank/books.json");
 const createError = require("http-errors");
 const { generateBarcode } = require("../../utils");
 const db = require("../../models");
+const upload = require("../../middlewares/upload");
 
 module.exports = {
   // ---------------------------------
@@ -29,7 +29,6 @@ module.exports = {
       // check book existence
       const book = await db.Book.findOne({
         where: { id: bookId },
-        attributes: { exclude: ["createdAt", "updatedAt"] },
         include: [
           {
             model: db.Chapter,
@@ -96,35 +95,28 @@ module.exports = {
   },
 
   // ---------------------------------
-  //        delete book
+  //        update book
   // -----------------------------------------
   update: async (req, res, next) => {
     try {
-      // get book id form url
       const bookId = req.params.id;
       if (!bookId) return next(createError(404, "Book id not found"));
 
-      // check book existence
-      const book = await db.Book.findByPk(bookId);
+      const book = await db.Book.findOne({ where: { id: bookId } });
       if (!book) return next(createError(404, "Book not found"));
 
-      // set data for update
-      const { name, image, isPublished } = req.body;
-      if (name !== undefined) book.name = name;
-      if (image !== undefined) book.image = image;
-      if (isPublished !== undefined) book.isPublished = isPublished;
+      const data = { ...req.body };
 
-      // update book record
-      await book.save();
+      // If file is uploaded, store its URL or path
+      if (req.file) {
+        data.coverUrl = `/uploads/${req.file.filename}`;
+      }
 
-      // send response
-      res.status(200).json({
-        status: "success",
-        message: "Book updated successfully",
-      });
-    } catch (err) {
-      console.log(err);
-      next(createError(500, "Failed to update book"));
+      await book.update(data);
+
+      res.status(200).json(book);
+    } catch (error) {
+      next(error);
     }
   },
 
