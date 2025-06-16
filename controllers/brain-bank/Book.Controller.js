@@ -1,9 +1,14 @@
+// external import
+const createError = require("http-errors");
+const path = require("path");
+const fs = require("fs");
+
 // internal imports
 const books = require("../../database/brain-bank/books.json");
-const createError = require("http-errors");
 const { generateBarcode } = require("../../utils");
 const db = require("../../models");
-const upload = require("../../middlewares/upload");
+
+const UPLOAD_DIR = path.join(__dirname, "../../uploads/");
 
 module.exports = {
   // ---------------------------------
@@ -11,7 +16,7 @@ module.exports = {
   // -----------------------------------------
   getBooks: (req, res, next) => {
     try {
-      res.json(books);
+      res.json(UPLOAD_DIR);
     } catch (err) {
       next(createError(500, "Failed to retrieve books"));
     }
@@ -99,21 +104,35 @@ module.exports = {
   // -----------------------------------------
   update: async (req, res, next) => {
     try {
+      // get book id
       const bookId = req.params.id;
       if (!bookId) return next(createError(404, "Book id not found"));
 
+      // check book existence
       const book = await db.Book.findOne({ where: { id: bookId } });
       if (!book) return next(createError(404, "Book not found"));
 
       const data = { ...req.body };
-
-      // If file is uploaded, store its URL or path
       if (req.file) {
-        data.coverUrl = `/uploads/${req.file.filename}`;
+        // Save new image path
+        data.image = `/uploads/${req.file.filename}`;
+
+        //Delete old image if it exists
+        if (book.image) {
+          const oldImagePath = path.join(UPLOAD_DIR, path.basename(book.image));
+          console.log(oldImagePath);
+          fs.access(oldImagePath, fs.constants.F_OK, (err) => {
+            if (!err) {
+              fs.unlink(oldImagePath, (err) => {
+                if (err) console.error("Failed to delete old image:", err);
+              });
+            }
+          });
+        }
       }
 
+      // update and response
       await book.update(data);
-
       res.status(200).json(book);
     } catch (error) {
       next(error);

@@ -26,17 +26,14 @@ module.exports = {
       if (!chapterId) return next(createError(404, "Book not found"));
 
       // Create new group
-      await db.Group.create({
+      const group = await db.Group.create({
         name: "Untitled Group",
         barcode: barcode,
         chapterId: chapterId,
       });
 
       // send response
-      res.status(200).json({
-        status: "success",
-        message: "Chapter created successfully",
-      });
+      res.status(200).json(group);
     } catch (err) {
       console.log(err);
       next(createError(500, "Failed to create Group"));
@@ -62,10 +59,7 @@ module.exports = {
       await group.save();
 
       // send response
-      res.status(200).json({
-        status: "success",
-        message: "Group updated successfully",
-      });
+      res.json(group);
     } catch (err) {
       console.log(err);
       next(createError(500, "Failed to update Group"));
