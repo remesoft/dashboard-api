@@ -1,10 +1,39 @@
 // internal imports
 const createError = require("http-errors");
 const db = require("../../models");
+const { where } = require("sequelize");
 
 module.exports = {
   // ---------------------------------
-  //        CREATE NEW QUESTION
+  //        GET CHAPTERS
+  // -----------------------------------------
+  getChapters: async (req, res, next) => {
+    try {
+      // get book id
+      const bookId = req.params.id;
+
+      console.log(bookId);
+      if (!bookId) return next(createError(404, "Book ID not found"));
+
+      // get all books
+      const chapters = await db.Chapter.findAll({
+        where: {
+          bookId: bookId,
+        },
+      });
+
+      console.log(chapters);
+
+      // send response
+      res.status(200).json(chapters);
+    } catch (err) {
+      console.log(err);
+      next(createError(500, "Failed to fetch Chapter"));
+    }
+  },
+
+  // ---------------------------------
+  //        CREATE NEW CHAPTER
   // -----------------------------------------
   create: async (req, res, next) => {
     try {
@@ -27,7 +56,7 @@ module.exports = {
   },
 
   // ---------------------------------
-  //        UPDATE THE QUESTIONS
+  //        UPDATE THE CHAPTER
   // -----------------------------------------
   update: async (req, res, next) => {
     try {
@@ -58,7 +87,7 @@ module.exports = {
   },
 
   // ---------------------------------
-  //        DELETE THE QUESTION
+  //        DELETE THE CHAPTER
   // -----------------------------------------
   delete: async (req, res, next) => {
     try {

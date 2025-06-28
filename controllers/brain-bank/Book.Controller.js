@@ -27,11 +27,9 @@ module.exports = {
   // -----------------------------------------
   getBook: async (req, res, next) => {
     try {
-      // get book id form url
       const bookId = req.params.id;
       if (!bookId) return next(createError(404, "Book id not found"));
 
-      // check book existence
       const book = await db.Book.findOne({
         where: { id: bookId },
         include: [
@@ -39,27 +37,18 @@ module.exports = {
             model: db.Chapter,
             as: "chapters",
             attributes: { exclude: ["createdAt", "updatedAt"] },
-            include: [
-              {
-                model: db.Group,
-                as: "groups",
-                attributes: { exclude: ["createdAt", "updatedAt"] },
-                include: [
-                  {
-                    model: db.Question,
-                    attributes: { exclude: ["createdAt", "updatedAt"] },
-                    as: "questions",
-                  },
-                ],
-              },
-            ],
           },
         ],
       });
+
       if (!book) return next(createError(404, "Book not found"));
 
-      // send response
-      res.json(book);
+      // add full image URL
+      const BASE_URL = process.env.BASE_URL || "http://localhost:8080";
+      const bookData = book.toJSON();
+      bookData.image = `${BASE_URL}/uploads/${book.image}`;
+
+      res.json(bookData);
     } catch (err) {
       next(createError(500, "Failed to retrieve book"));
     }
@@ -70,32 +59,25 @@ module.exports = {
   // -----------------------------------------
   create: async (req, res, next) => {
     try {
-      // generate barcode
-      const barcode = generateBarcode();
+      const file = req.file;
+      const name = req.body.name;
 
-      // 1. Create Book
-      const book = await db.Book.create({ name: "Untitled" });
+      if (!name || !file) {
+        return res
+          .status(400)
+          .json({ message: "Name and image are required." });
+      }
 
-      // 2. Create Chapters for the Book
-      const chapter = await db.Chapter.create({
-        name: "Untitled Chapter 1",
-        bookId: book.id,
+      const imagePath = file.filename;
+      const book = await db.Book.create({
+        name: name,
+        image: imagePath,
       });
 
-      // 3. Create Groups for a Chapter
-      const group = await db.Group.create({
-        name: "Untitled Group 1",
-        barcode: barcode,
-        chapterId: chapter.id,
-      });
-
-      res.status(201).json({
-        status: "success",
-        message: "New Book Created",
-      });
-    } catch (err) {
-      console.error(err);
-      next(createError(500, "Book creation failed"));
+      res.json(book);
+    } catch (error) {
+      console.log(error);
+      console.log("something went wrong");
     }
   },
 

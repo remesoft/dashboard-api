@@ -9,8 +9,27 @@ module.exports = {
   // ---------------------------------
   //        GET GROUP
   // -----------------------------------------
-  getGroup: (req, res, next) => {
-    res.json(data);
+  getGroup: async (req, res, next) => {
+    try {
+      // get book id
+      const chapterId = req.params.id;
+
+      console.log(chapterId);
+      if (!chapterId) return next(createError(404, "Chapter ID not found"));
+
+      // get all books
+      const groups = await db.Group.findAll({
+        where: { chapterId },
+      });
+
+      console.log(groups);
+
+      // send response
+      res.status(200).json(groups);
+    } catch (err) {
+      console.log(err);
+      next(createError(500, "Failed to fetch Groups"));
+    }
   },
 
   // ---------------------------------

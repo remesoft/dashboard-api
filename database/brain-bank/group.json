@@ -1,31 +1,14 @@
-{
-  "id": 1,
-  "name": "Group One",
-  "options": ["ক", "খ", "গ", "ঘ"],
-  "questions": [
-    {
-      "id": 1,
-      "answer": 3,
-      "info": {
-        "type": "video",
-        "content": "https://www.youtube.com/example.mp4"
-      }
-    },
-    {
-      "id": 1,
-      "answer": 1,
-      "info": {
-        "type": "video",
-        "content": "https://www.youtube.com/example.mp4"
-      }
-    },
-    {
-      "id": 1,
-      "answer": 0,
-      "info": {
-        "type": "video",
-        "content": "https://www.youtube.com/example.mp4"
-      }
-    }
-  ]
-}
+[
+  {
+    "id": 1,
+    "name": "Group One"
+  },
+  {
+    "id": 2,
+    "name": "Group Two"
+  },
+  {
+    "id": 3,
+    "name": "Group Three"
+  }
+]

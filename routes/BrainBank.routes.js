@@ -15,11 +15,12 @@ const router = express.Router();
 // books related routes
 router.get("/books", books.getBooks);
 router.get("/books/:id", books.getBook);
-router.post("/books/create", books.create);
+router.post("/books/create", upload.single("cover"), books.create);
 router.delete("/books/:id", books.delete);
 router.patch("/books/:id", upload.single("cover"), books.update);
 
 // chapter related routes
+router.get("/chapters/:id", chapter.getChapters);
 router.post("/chapters/create", chapter.create);
 router.delete("/chapters/:id", chapter.delete);
 
