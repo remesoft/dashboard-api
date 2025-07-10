@@ -14,10 +14,11 @@ module.exports = {
   // ---------------------------------
   //        Get All Books
   // -----------------------------------------
-  getBooks: (req, res, next) => {
+  getBooks: async (req, res, next) => {
     try {
-      res.json(UPLOAD_DIR);
-    } catch (err) {
+      const books = await db.Book.findAll();
+      res.json(books);
+    } catch (error) {
       next(createError(500, "Failed to retrieve books"));
     }
   },
@@ -30,26 +31,57 @@ module.exports = {
       const bookId = req.params.id;
       if (!bookId) return next(createError(404, "Book id not found"));
 
-      const book = await db.Book.findOne({
-        where: { id: bookId },
-        include: [
-          {
-            model: db.Chapter,
-            as: "chapters",
-            attributes: { exclude: ["createdAt", "updatedAt"] },
-          },
-        ],
+      // Step 1: Fetch chapters only (no need to fetch full book with associations)
+      const book = await db.Book.findByPk(bookId, {
+        include: {
+          model: db.Chapter,
+          as: "chapters",
+          attributes: ["id"],
+        },
       });
 
       if (!book) return next(createError(404, "Book not found"));
 
-      // add full image URL
-      const BASE_URL = process.env.BASE_URL || "http://localhost:8080";
-      const bookData = book.toJSON();
-      bookData.image = `${BASE_URL}/uploads/${book.image}`;
+      const chapters = book.chapters || [];
+      const chapterIds = chapters.map((c) => c.id);
 
-      res.json(bookData);
+      // Step 2: Count groups under these chapters
+      const totalGroups = chapterIds.length
+        ? await db.Group.count({ where: { chapterId: chapterIds } })
+        : 0;
+
+      // Step 3: Get all group IDs under these chapters
+      const groups = chapterIds.length
+        ? await db.Group.findAll({
+            where: { chapterId: chapterIds },
+            attributes: ["id"],
+          })
+        : [];
+
+      const groupIds = groups.map((g) => g.id);
+
+      // Step 4: Count total questions under these groupIds
+      const totalQuestions = groupIds.length
+        ? await db.Question.count({ where: { groupId: groupIds } })
+        : 0;
+
+      // Step 5: Build minimal response
+      const BASE_URL = process.env.BASE_URL || "http://localhost:8080";
+
+      const response = {
+        id: book.id,
+        name: book.name,
+        image: `${BASE_URL}/uploads/${book.image}`,
+        totalChapters: chapterIds.length,
+        totalGroups,
+        totalQuestions,
+        createdAt: book.createdAt,
+        updatedAt: book.updatedAt,
+      };
+
+      res.json(response);
     } catch (err) {
+      console.error(err);
       next(createError(500, "Failed to retrieve book"));
     }
   },
@@ -97,7 +129,7 @@ module.exports = {
       const data = { ...req.body };
       if (req.file) {
         // Save new image path
-        data.image = `/uploads/${req.file.filename}`;
+        data.image = req.file.filename;
 
         //Delete old image if it exists
         if (book.image) {

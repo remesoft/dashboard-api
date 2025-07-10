@@ -12,20 +12,14 @@ module.exports = {
   getGroup: async (req, res, next) => {
     try {
       // get book id
-      const chapterId = req.params.id;
-
-      console.log(chapterId);
-      if (!chapterId) return next(createError(404, "Chapter ID not found"));
+      const groupId = req.params.id;
+      if (!groupId) return next(createError(404, "Group ID not found"));
 
       // get all books
-      const groups = await db.Group.findAll({
-        where: { chapterId },
-      });
-
-      console.log(groups);
+      const group = await db.Group.findByPk(groupId);
 
       // send response
-      res.status(200).json(groups);
+      res.status(200).json(group);
     } catch (err) {
       console.log(err);
       next(createError(500, "Failed to fetch Groups"));

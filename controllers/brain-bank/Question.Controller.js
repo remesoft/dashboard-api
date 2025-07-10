@@ -3,6 +3,19 @@ const createError = require("http-errors");
 const db = require("../../models");
 
 module.exports = {
+  getQuestions: async (req, res, next) => {
+    try {
+      const groupId = req.params.groupId;
+      if (!groupId) return next(createError(404, "Group not found."));
+      const questions = await db.Question.findAll({ where: { groupId } });
+      if (!questions) return next(createError(404, "Questions not found!"));
+
+      res.json(questions);
+    } catch (err) {
+      next(createError(500, "Failed to retrieve book"));
+    }
+  },
+
   // ---------------------------------
   //        CREATE NEW QUESTION
   // -----------------------------------------

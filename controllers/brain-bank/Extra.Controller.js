@@ -9,11 +9,14 @@ module.exports = {
   getExtra: async (req, res, next) => {
     try {
       // exarate extra id
-      const extraId = req.params.id;
-      if (!extraId) return next(createError(404, "Extra id not found"));
+      const questionId = req.params.questionId;
+      if (!questionId) return next(createError(404, "Question id not found!"));
 
       // get data form database
-      const extra = await db.Extra.findByPk(extraId);
+      const extra = await db.Extra.findOne({
+        where: { questionId },
+      });
+
       res.json(extra);
     } catch (err) {
       console.log(err);
@@ -24,27 +27,27 @@ module.exports = {
   // ---------------------------------
   //       CREATE EXTRA INFO
   // -----------------------------------------
-  create: async (req, res, next) => {
+  createOrUpdate: async (req, res, next) => {
     try {
-      // get data form url
       const { questionId, type, content } = req.body;
-      if (!questionId) return next(createError(404, "Question Id not found"));
+      if (!questionId) return next(createError(400, "Question ID is required"));
 
-      // create new question
-      await db.Extra.create({
-        questionId: questionId,
-        type: type,
-        content: content,
-      });
+      // ✅ Check if related question exists
+      const question = await db.Question.findByPk(questionId);
+      if (!question) {
+        return next(createError(404, "Referenced question does not exist"));
+      }
 
-      // send response
+      // ✅ Either upsert or do find+update/create
+      await db.Extra.upsert({ questionId, type, content });
+
       res.status(200).json({
         status: "success",
-        message: "Extra created successfully",
+        message: "Extra created or updated successfully",
       });
     } catch (err) {
-      console.log(err);
-      next(createError(500, "Failed to create Extra"));
+      console.error(err);
+      next(createError(500, "Failed to create or update Extra"));
     }
   },
 
@@ -83,11 +86,11 @@ module.exports = {
   delete: async (req, res, next) => {
     try {
       // exarate extra id
-      const extraId = req.params.id;
-      if (!extraId) return next(createError(404, "Extra id not found"));
+      const questionId = req.params.questionId;
+      if (!questionId) return next(createError(404, "Extra not found"));
 
       // delete form database
-      await db.Extra.destroy({ where: { id: extraId } });
+      await db.Extra.destroy({ where: { questionId } });
 
       // send response
       res.status(200).json({

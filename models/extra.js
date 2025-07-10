@@ -12,7 +12,10 @@ module.exports = (sequelize, DataTypes) => {
   }
   Extra.init(
     {
-      questionId: DataTypes.INTEGER,
+      questionId: {
+        type: DataTypes.INTEGER,
+        unique: true,
+      },
       type: DataTypes.ENUM("video", "article"),
       content: DataTypes.STRING,
     },

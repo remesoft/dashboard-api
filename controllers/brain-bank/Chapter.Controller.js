@@ -33,6 +33,32 @@ module.exports = {
   },
 
   // ---------------------------------
+  //        GET GROUPS
+  // -----------------------------------------
+  getGroup: async (req, res, next) => {
+    try {
+      // get book id
+      const chapterId = req.params.id;
+
+      console.log(chapterId);
+      if (!chapterId) return next(createError(404, "Chapter ID not found"));
+
+      // get all books
+      const groups = await db.Group.findAll({
+        where: { chapterId },
+      });
+
+      console.log(groups);
+
+      // send response
+      res.status(200).json(groups);
+    } catch (err) {
+      console.log(err);
+      next(createError(500, "Failed to fetch Groups"));
+    }
+  },
+
+  // ---------------------------------
   //        CREATE NEW CHAPTER
   // -----------------------------------------
   create: async (req, res, next) => {
@@ -61,24 +87,20 @@ module.exports = {
   update: async (req, res, next) => {
     try {
       // get data form url
-      const questionId = req.params.id;
-      if (!questionId) return next(createError(404, "Question ID not found"));
+      const chapterId = req.params.id;
+      if (!chapterId) return next(createError(404, "Chapter ID not found"));
 
       // if group not found in database
-      const question = await db.Question.findByPk(questionId);
-      if (!question) return next(createError(404, "Question not found"));
+      const chapter = await db.Chapter.findByPk(chapterId);
+      if (!chapterId) return next(createError(404, "Question not found"));
 
       // set data for update
-      const { answer } = req.body;
-      if (answer !== undefined) question.answer = answer;
-
-      // update book record
-      await question.save();
+      chapter.update(req.body);
 
       // send response
       res.status(200).json({
         status: "success",
-        message: "Question updated successfully",
+        message: "Chapter updated successfully",
       });
     } catch (err) {
       console.log(err);

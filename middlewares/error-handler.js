@@ -8,6 +8,7 @@ const notFoundHandler = (req, res, next) => {
 
 // default error handler
 const defaultErrorHandler = (err, req, res, next) => {
+  console.log(err);
   res.status(err.status || 500);
   res.json({
     status: "error",

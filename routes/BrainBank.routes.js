@@ -21,8 +21,10 @@ router.patch("/books/:id", upload.single("cover"), books.update);
 
 // chapter related routes
 router.get("/chapters/:id", chapter.getChapters);
+router.get("/chapters/:id/groups", chapter.getGroup);
 router.post("/chapters/create", chapter.create);
 router.delete("/chapters/:id", chapter.delete);
+router.patch("/chapters/:id", chapter.update);
 
 // groups related routes
 router.get("/groups/:id", groups.getGroup);
@@ -31,15 +33,15 @@ router.patch("/groups/:id", groups.update);
 router.delete("/groups/:id", groups.delete);
 
 // questions related routes
+router.get("/questions/:groupId", questions.getQuestions);
 router.post("/questions/create", questions.create);
-router.put("/questions/:id", questions.update);
+router.patch("/questions/:id", questions.update);
 router.delete("/questions/:id", questions.delete);
 
 // extra information related routes
-router.get("/extras/:id", extra.getExtra);
-router.post("/extras/create", extra.create);
-router.put("/extras/:id", extra.update);
-router.post("/extras/:id", extra.delete);
+router.get("/extras/:questionId", extra.getExtra);
+router.post("/extras/create", extra.createOrUpdate);
+router.delete("/extras/:questionId", extra.delete);
 
 // export route
 module.exports = router;
