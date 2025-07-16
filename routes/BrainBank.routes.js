@@ -8,6 +8,7 @@ const chapter = require("../controllers/brain-bank/Chapter.Controller");
 const groups = require("../controllers/brain-bank/Group.Controller");
 const questions = require("../controllers/brain-bank/Question.Controller");
 const extra = require("../controllers/brain-bank/Extra.Controller");
+const download = require("../controllers/brain-bank/Download.Controller");
 
 // declaration
 const router = express.Router();
@@ -42,6 +43,9 @@ router.delete("/questions/:id", questions.delete);
 router.get("/extras/:questionId", extra.getExtra);
 router.post("/extras/create", extra.createOrUpdate);
 router.delete("/extras/:questionId", extra.delete);
+
+// download database
+router.get("/download/database", download.database);
 
 // export route
 module.exports = router;
