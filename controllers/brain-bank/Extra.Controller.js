@@ -57,11 +57,13 @@ module.exports = {
   update: async (req, res, next) => {
     try {
       // get data form url
-      const questionId = req.params.id;
-      if (!questionId) return next(createError(404, "Question Id not found"));
+      const questionId = req.params.questionId;
+      if (!questionId) return next(createError(404, "Question id not found"));
 
       // check book existence
-      const extra = await db.Extra.findOne({ where: { questionId } });
+      const extra = await db.Extra.findOne({
+        where: { questionId: questionId },
+      });
       if (!extra) return next(createError(404, "Extra not found"));
 
       //Update Extra info

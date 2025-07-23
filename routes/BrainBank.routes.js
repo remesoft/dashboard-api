@@ -42,6 +42,7 @@ router.delete("/questions/:id", questions.delete);
 // extra information related routes
 router.get("/extras/:questionId", extra.getExtra);
 router.post("/extras/create", extra.createOrUpdate);
+router.patch("/extras/:questionId", extra.update);
 router.delete("/extras/:questionId", extra.delete);
 
 // download database

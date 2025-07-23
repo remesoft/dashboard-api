@@ -7,12 +7,35 @@ module.exports = {
     try {
       const groupId = req.params.groupId;
       if (!groupId) return next(createError(404, "Group not found."));
-      const questions = await db.Question.findAll({ where: { groupId } });
-      if (!questions) return next(createError(404, "Questions not found!"));
 
-      res.json(questions);
+      const questions = await db.Question.findAll({
+        where: { groupId },
+        include: [
+          {
+            model: db.Extra,
+            as: "extra",
+            required: false,
+          },
+        ],
+      });
+
+      if (!questions || questions.length === 0) {
+        return next(createError(404, "Questions not found!"));
+      }
+
+      // Add hasExtra and remove extra
+      const result = questions.map((q) => {
+        const plain = q.get({ plain: true });
+        delete plain.extra;
+        return {
+          ...plain,
+          hasExtra: !!q.extra,
+        };
+      });
+
+      res.json(result);
     } catch (err) {
-      next(createError(500, "Failed to retrieve book"));
+      next(createError(500, "Failed to retrieve questions"));
     }
   },
 
