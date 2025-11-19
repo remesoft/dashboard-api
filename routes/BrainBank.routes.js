@@ -9,6 +9,8 @@ const groups = require("../controllers/brain-bank/Group.Controller");
 const questions = require("../controllers/brain-bank/Question.Controller");
 const extra = require("../controllers/brain-bank/Extra.Controller");
 const download = require("../controllers/brain-bank/Download.Controller");
+const otpRequest = require("../controllers/brain-bank/OtpRequest.Controller");
+const user = require("../controllers/brain-bank/User.controller");
 
 // declaration
 const router = express.Router();
@@ -44,6 +46,13 @@ router.get("/extras/:questionId", extra.getExtra);
 router.post("/extras/create", extra.createOrUpdate);
 router.patch("/extras/:questionId", extra.update);
 router.delete("/extras/:questionId", extra.delete);
+
+// otp request related routes
+router.post("/otp/create", otpRequest.create);
+router.patch("/otp/verify", otpRequest.verify);
+
+// register routes
+router.post("/auth/register", user.create);
 
 // download database
 router.get("/download/database", download.database);

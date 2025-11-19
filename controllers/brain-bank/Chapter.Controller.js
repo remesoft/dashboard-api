@@ -11,8 +11,6 @@ module.exports = {
     try {
       // get book id
       const bookId = req.params.id;
-
-      console.log(bookId);
       if (!bookId) return next(createError(404, "Book ID not found"));
 
       // get all books
@@ -21,8 +19,6 @@ module.exports = {
           bookId: bookId,
         },
       });
-
-      console.log(chapters);
 
       // send response
       res.status(200).json(chapters);
