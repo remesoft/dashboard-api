@@ -9,7 +9,7 @@ const {
   defaultErrorHandler,
   notFoundHandler,
 } = require("./middlewares/error-handler");
-const BrainBank = require("./routes/BrainBank.routes");
+const BrainBank = require("./routes/brain-bank.routes");
 
 // define app
 const app = express();

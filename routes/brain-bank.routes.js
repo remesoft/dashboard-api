@@ -11,6 +11,9 @@ const extra = require("../controllers/brain-bank/Extra.Controller");
 const download = require("../controllers/brain-bank/Download.Controller");
 const otpRequest = require("../controllers/brain-bank/OtpRequest.Controller");
 const user = require("../controllers/brain-bank/User.controller");
+const bookRequest = require("../controllers/brain-bank/BookRequest.controller");
+const product = require("../controllers/brain-bank/Product.Controller");
+const library = require("../controllers/brain-bank/Library.Controller");
 
 // declaration
 const router = express.Router();
@@ -56,6 +59,20 @@ router.post("/auth/register", user.create);
 
 // download database
 router.get("/download/database", download.database);
+
+// book request routes
+router.get("/book-requests", bookRequest.getBookRequests);
+router.post("/book-requests/create", bookRequest.create);
+router.delete("/book-requests/:id", bookRequest.deleteBookRequest);
+
+// product routes
+router.get("/products", product.index);
+router.get("/products/:id", product.show);
+router.post("/products", product.store);
+router.delete("/products/:id", product.destroy);
+
+// library routes
+router.get("/library", library.index);
 
 // export route
 module.exports = router;
