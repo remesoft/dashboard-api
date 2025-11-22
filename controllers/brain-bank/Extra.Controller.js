@@ -32,13 +32,13 @@ module.exports = {
       const { questionId, type, content } = req.body;
       if (!questionId) return next(createError(400, "Question ID is required"));
 
-      // ✅ Check if related question exists
+      // Check if related question exists
       const question = await db.Question.findByPk(questionId);
       if (!question) {
         return next(createError(404, "Referenced question does not exist"));
       }
 
-      // ✅ Either upsert or do find+update/create
+      // Either upsert or do find+update/create
       await db.Extra.upsert({ questionId, type, content });
 
       res.status(200).json({

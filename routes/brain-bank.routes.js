@@ -14,6 +14,8 @@ const user = require("../controllers/brain-bank/User.controller");
 const bookRequest = require("../controllers/brain-bank/BookRequest.controller");
 const product = require("../controllers/brain-bank/Product.Controller");
 const library = require("../controllers/brain-bank/Library.Controller");
+const reviews = require("../controllers/brain-bank/Review.Controller");
+const reviewReplay = require("../controllers/brain-bank/ReviewReplay.Controller");
 
 // declaration
 const router = express.Router();
@@ -73,6 +75,16 @@ router.delete("/products/:id", product.destroy);
 
 // library routes
 router.get("/library", library.index);
+
+// review routes
+router.get("/reviews", reviews.index);
+router.post("/reviews", reviews.store);
+router.get("/products/:productId/reviews", reviews.productReview);
+
+// review replay routes
+router.post("/reviews/:reviewId/replays", reviewReplay.store);
+router.patch("/reviews/replays/:id", reviewReplay.update);
+router.delete("/reviews/replays/:id", reviewReplay.destroy);
 
 // export route
 module.exports = router;

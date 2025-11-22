@@ -32,13 +32,24 @@ module.exports = {
   // ---------------------------------
   show: async (req, res, next) => {
     try {
+      // load product
       const productId = req.params.id;
       if (!productId) return next(createError(400, "Product ID is required"));
 
-      const product = await db.Product.findByPk(productId);
+      // load product with image
+      const product = await db.Product.findByPk(productId, {
+        include: [
+          {
+            model: db.Image,
+            as: "images",
+          },
+        ],
+      });
 
+      // if product not found send error response
       if (!product) return next(createError(404, "Product not found"));
 
+      // send response
       res.status(200).json({
         success: true,
         message: "Product retrieved successfully",

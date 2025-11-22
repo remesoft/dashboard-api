@@ -8,14 +8,14 @@ module.exports = {
       [
         {
           id: 1,
-          name: "ICT Interactive MCQs",
+          name: "SEED : ICT Interactive MCQs",
           description: "Demo description for ICT Interactive MCQs application",
           price: 150.0,
           discountedPrice: 120.0,
           categoryId: 1,
           additionalInfo: JSON.stringify({
-            videoLessons: "300+",
-            audioLessons: "150+",
+            videoLessons: "200+",
+            audioLessons: "100+",
           }),
           createdAt: new Date(),
           updatedAt: new Date(),
