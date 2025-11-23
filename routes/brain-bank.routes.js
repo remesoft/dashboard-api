@@ -16,6 +16,7 @@ const product = require("../controllers/brain-bank/Product.Controller");
 const library = require("../controllers/brain-bank/Library.Controller");
 const reviews = require("../controllers/brain-bank/Review.Controller");
 const reviewReplay = require("../controllers/brain-bank/ReviewReplay.Controller");
+const ratingSummary = require("../controllers/brain-bank/RatingSummary.Controller");
 
 // declaration
 const router = express.Router();
@@ -85,6 +86,9 @@ router.get("/products/:productId/reviews", reviews.productReview);
 router.post("/reviews/:reviewId/replays", reviewReplay.store);
 router.patch("/reviews/replays/:id", reviewReplay.update);
 router.delete("/reviews/replays/:id", reviewReplay.destroy);
+
+// rating summary routes
+router.get("/products/:productId/rating-summary", ratingSummary.index);
 
 // export route
 module.exports = router;
