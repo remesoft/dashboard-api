@@ -1,5 +1,6 @@
 // external imports
 require("dotenv").config();
+require("module-alias/register");
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
@@ -9,7 +10,7 @@ const {
   defaultErrorHandler,
   notFoundHandler,
 } = require("./middlewares/error-handler");
-const BrainBank = require("./routes/brain-bank.routes");
+const routes = require("./routes");
 
 // define app
 const app = express();
@@ -26,8 +27,8 @@ app.use(
   })
 );
 
-// routes
-app.use("/brain-bank", BrainBank);
+// routes setup
+app.use("/", routes);
 
 // error handlers
 app.use(notFoundHandler);
