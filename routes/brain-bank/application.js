@@ -10,7 +10,11 @@ const library = require("@/controllers/brain-bank/Library.Controller");
 const reviews = require("@/controllers/brain-bank/Review.Controller");
 const reviewReplay = require("@/controllers/brain-bank/ReviewReplay.Controller");
 const ratingSummary = require("@/controllers/brain-bank/RatingSummary.Controller");
-const orderController = require("@/controllers/brain-bank/Order.Controller.js");
+const order = require("@/controllers/brain-bank/Order.Controller.js");
+const notification = require("@/controllers/brain-bank/Notification.Controller.js");
+
+// validators
+const validateNotification = require("@/middlewares/validators/validate-notification.js");
 
 // declaration
 const router = express.Router();
@@ -50,7 +54,21 @@ router.delete("/reviews/replays/:id", reviewReplay.destroy);
 router.get("/products/:productId/rating-summary", ratingSummary.index);
 
 // orders routes
-router.post("/orders", orderController.store);
+router.post("/orders", order.store);
+router.post("/orders/:id", order.show);
+router.get("/orders/user/:userId", orderController.userOrders);
+
+// notification routes
+router.post("/notifications", validateNotification, notification.store);
+router.get("/notifications", notification.index);
+router.put("/notifications/:id/read", notification.markAsRead);
+router.put("/notifications/mark-all-seen", notification.markAllAsSeen);
+
+// POST   /notifications
+// GET    /notifications
+// PUT    /notifications/:id/read
+// PUT    /notifications/mark-all-seen
+// DELETE /notifications/:id
 
 // export route
 module.exports = router;

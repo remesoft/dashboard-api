@@ -93,3 +93,7 @@ module.exports = {
   },
 };
 ```
+
+## column name in database
+
+should be camel case.

@@ -48,7 +48,7 @@ module.exports = (sequelize, DataTypes) => {
       // Payment & status
       paymentMethod: {
         type: DataTypes.STRING,
-        defaultValue: "cash-on-delivery",
+        defaultValue: "cod",
       },
       paymentStatus: {
         type: DataTypes.STRING,

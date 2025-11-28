@@ -36,6 +36,9 @@ module.exports = {
   // ---------------------------------
   // GET SINGLE ORDER
   // ---------------------------------
+  // ---------------------------------
+  // GET SINGLE ORDER
+  // ---------------------------------
   show: async (req, res, next) => {
     try {
       const order = await Order.findByPk(req.params.id, {
@@ -43,7 +46,7 @@ module.exports = {
           {
             model: Product,
             as: "product",
-            attributes: ["id", "name", "price", "discountedPrice"],
+            attributes: ["id", "name"],
           },
         ],
       });
@@ -164,6 +167,39 @@ module.exports = {
     } catch (err) {
       console.error(err);
       next(createError(500, "Failed to delete order"));
+    }
+  },
+
+  // ---------------------------------
+  // GET ORDERS OF A SPECIFIC USER
+  // ---------------------------------
+  userOrders: async (req, res, next) => {
+    try {
+      const userId = req.params.userId;
+
+      if (!userId) {
+        return next(createError(400, "User ID is required"));
+      }
+
+      const orders = await Order.findAll({
+        where: { userId },
+        include: [
+          {
+            model: Product,
+            as: "product",
+            attributes: ["id", "name"], // product info only
+          },
+        ],
+        order: [["createdAt", "DESC"]],
+      });
+
+      res.status(200).json({
+        success: true,
+        data: orders,
+      });
+    } catch (err) {
+      console.error(err);
+      next(createError(500, "Failed to fetch user orders"));
     }
   },
 };
