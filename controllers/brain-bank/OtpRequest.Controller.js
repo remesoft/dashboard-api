@@ -13,7 +13,7 @@ module.exports = {
       const { phone } = req.body;
       if (!phone) return next(createError(400, "Phone number is required"));
 
-      const otp = Math.floor(1000 + Math.random() * 9000).toString();
+      const otp = Math.floor(10000 + Math.random() * 90000).toString();
       const expiresAt = new Date(Date.now() + 5 * 60 * 1000); // 5 mins
 
       const existing = await OtpRequest.findOne({
