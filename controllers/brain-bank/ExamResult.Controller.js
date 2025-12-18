@@ -34,10 +34,10 @@ module.exports = {
   // ---------------------------------
   show: async (req, res, next) => {
     try {
-      console.log(req);
+      console.log(req.user);
 
-      //   const userId = req.user.id;
-      //   const { id } = req.params;
+      const userId = req.user.id;
+      const { id } = req.params;
 
       //   const examResult = await db.ExamResult.findOne({
       //     where: {
@@ -68,6 +68,7 @@ module.exports = {
   store: async (req, res, next) => {
     try {
       console.log(req.body);
+      console.log("-----------------Working-----------------------");
       //   const userId = req.user.id;
       //   const { groupId, correct, wrong, unanswered } = req.body;
       //   // Validate input

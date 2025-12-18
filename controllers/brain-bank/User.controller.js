@@ -1,4 +1,5 @@
 // internal imports
+const { generateAccessToken, generateRefreshToken } = require("@/utils/token");
 const createError = require("http-errors");
 const db = require("../../models");
 
@@ -58,10 +59,22 @@ module.exports = {
         mobile,
       });
 
+      // create payload for response
+      const payload = {
+        id: user.id,
+        role: user.role,
+      };
+
+      const accessToken = generateAccessToken(payload);
+      const refreshToken = generateRefreshToken(payload);
+
       res.status(201).json({
         success: true,
         message: "User created successfully",
-        data: user,
+        data: {
+          accessToken,
+          refreshToken,
+        },
       });
     } catch (err) {
       console.log("CREATE USER ERROR:", err);
@@ -107,9 +120,7 @@ module.exports = {
     try {
       const userId = req.params.id;
       if (!userId) return next(createError(400, "User ID is required"));
-
       const rows = await User.destroy({ where: { id: userId } });
-
       if (rows === 0) return next(createError(404, "User not found"));
 
       res.status(200).json({

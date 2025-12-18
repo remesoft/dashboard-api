@@ -2,11 +2,12 @@
 const jwt = require("jsonwebtoken");
 const createError = require("http-errors");
 
-// load secret key from env
-const SECRET_KEY = process.env.JWT_SECRET || "super_secret_key";
+// load secret key from env - use ACCESS_TOKEN_SECRET for access tokens
+const ACCESS_TOKEN_SECRET =
+  process.env.ACCESS_TOKEN_SECRET || "your_access_secret";
 
 // middleware function
-const authMiddleware = (req, res, next) => {
+module.exports = (req, res, next) => {
   const authHeader = req.headers["authorization"];
 
   if (!authHeader) {
@@ -14,15 +15,20 @@ const authMiddleware = (req, res, next) => {
   }
 
   const token = authHeader.split(" ")[1];
-  if (!token) return next(createError(401, "Token missing"));
+  if (!token) {
+    return next(createError(401, "Token missing"));
+  }
 
   try {
-    const decoded = jwt.verify(token, SECRET_KEY);
+    // Verify using the same secret that was used to sign the token
+    const decoded = jwt.verify(token, ACCESS_TOKEN_SECRET);
+    console.log(decoded);
     req.user = decoded;
     next();
   } catch (err) {
-    next(createError(401, "Invalid or expired token"));
+    if (err.name === "TokenExpiredError") {
+      return next(createError(401, "Token expired"));
+    }
+    return next(createError(401, "Invalid token"));
   }
 };
-
-module.exports = authMiddleware;

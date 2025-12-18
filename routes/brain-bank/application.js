@@ -13,6 +13,7 @@ const ratingSummary = require("@/controllers/brain-bank/RatingSummary.Controller
 const order = require("@/controllers/brain-bank/Order.Controller");
 const notification = require("@/controllers/brain-bank/Notification.Controller");
 const examResult = require("@/controllers/brain-bank/ExamResult.Controller");
+const authController = require("@/controllers/brain-bank/Auth.Controller.js");
 
 // validators
 const validateNotification = require("@/middlewares/validators/validate-notification");
@@ -20,12 +21,16 @@ const validateNotification = require("@/middlewares/validators/validate-notifica
 // declaration
 const router = express.Router();
 
+// middlewares
+const auth = require("@/middlewares/auth.js");
+
 // otp request related routes
 router.post("/otp/create", otpRequest.create);
 router.patch("/otp/verify", otpRequest.verify);
 
 // register routes
 router.post("/auth/register", user.create);
+router.post("/auth/refresh", authController.refreshToken);
 
 // book request routes
 router.get("/book-requests", bookRequest.getBookRequests);
@@ -65,7 +70,7 @@ router.get("/notifications", notification.index);
 router.put("/notifications/:id/read", notification.markAsRead);
 router.put("/notifications/mark-all-seen", notification.markAllAsSeen);
 
-router.post("/exam-results", examResult.store);
+router.post("/exam-results", auth, examResult.store);
 // POST   /notifications
 // GET    /notifications
 // PUT    /notifications/:id/read
