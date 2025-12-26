@@ -3,6 +3,7 @@ const createError = require("http-errors");
 const db = require("../../models");
 
 const OtpRequest = db.OtpRequest;
+const User = db.User;
 
 module.exports = {
   // ---------------------------------
@@ -57,17 +58,21 @@ module.exports = {
   // -----------------------------------------
   verify: async (req, res, next) => {
     try {
+      // data form request body
       const { phone, otp } = req.body;
 
+      // validate data
       if (!phone || !otp) {
         return next(createError(400, "Phone and OTP are required"));
       }
 
+      // check is opt requested
       const otpRequest = await OtpRequest.findOne({
         where: { phone },
         order: [["createdAt", "DESC"]],
       });
 
+      // response if request not found
       if (!otpRequest) return next(createError(404, "OTP request not found"));
 
       // Check expiry
@@ -95,9 +100,15 @@ module.exports = {
         attempts: 0,
       });
 
+      // check user type
+      const user = await db.User.findOne({ where: { mobile: phone } });
+
       res.status(200).json({
         success: true,
         message: "OTP verified successfully",
+        data: {
+          userType: user ? "existing" : "new",
+        },
       });
     } catch (err) {
       console.log(err);

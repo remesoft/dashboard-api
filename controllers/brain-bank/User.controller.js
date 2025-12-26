@@ -41,7 +41,7 @@ module.exports = {
 
       // Check OTP verification
       const otpRecord = await OtpRequest.findOne({
-        where: { phone: mobile },
+        where: { phone: mobile }, // assuming OTP uses phone field
         order: [["createdAt", "DESC"]],
       });
 
@@ -53,13 +53,18 @@ module.exports = {
         return next(createError(400, "Phone number is not verified"));
       }
 
-      // Create user
-      const user = await User.create({
-        name,
-        mobile,
-      });
+      // Check if user already exists
+      const existingUser = await User.findOne({ where: { mobile } });
+      if (existingUser) {
+        return next(
+          createError(409, "User with this mobile number already exists")
+        );
+      }
 
-      // create payload for response
+      // Create new user
+      const user = await User.create({ name, mobile });
+
+      // Create payload for response
       const payload = {
         id: user.id,
         role: user.role,
